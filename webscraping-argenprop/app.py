@@ -6,7 +6,7 @@ import json
 
 app = Flask(__name__)
 
-@app.route('/argenprop', methods=['GET'])
+@app.route('/argenprop', methods=['POST'])
 def argenprop_web_scraper():
     try:
         # Validar que el cuerpo de la solicitud sea JSON válido
