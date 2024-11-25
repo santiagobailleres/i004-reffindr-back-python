@@ -36,7 +36,7 @@ RUN rm -f requirements.txt
 # Cambia al usuario no privilegiado para ejecutar la aplicación
 USER appuser
 
-# Declara el puerto en el que la aplicación estará escuchando
+# Exponer el puerto en el que escucha la aplicación
 EXPOSE 8000
 
 # Comando por defecto para ejecutar la aplicación

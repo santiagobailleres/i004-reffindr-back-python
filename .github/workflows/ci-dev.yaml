@@ -1,0 +1,119 @@
+name: Develop CI/CD Pipeline
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Choose the environment to deploy'
+        required: true
+        default: 'develop'
+        type: choice
+        options:
+          - develop
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5.3.0
+      with:
+        python-version: '3.9'
+        cache: 'pip'
+
+    - name: Cache Python dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    #     pip install flake8 pytest
+
+    - name: Scan Python dependencies for vulnerabilities
+      run: |
+        python -m pip install pip-audit
+        pip-audit --output audit-log.txt || true
+        if grep -qE 'CRITICAL|HIGH' audit-log.txt; then
+          echo "Critical or High vulnerabilities found. Failing pipeline."
+          exit 1
+        else
+          echo "No critical or high vulnerabilities found."
+        fi
+
+    - name: Display Audit Log
+      run: echo "$(cat audit-log.txt)"
+  
+    - name: Upload Audit Logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-audit-logs
+        path: ./audit-log.txt
+      if: always()
+
+    # - name: Lint with flake8
+    #   run: |
+    #     # stop the build if there are Python syntax errors or undefined names
+    #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    #     # exit-zero treats all errors as warnings
+    #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    # - name: Run tests
+    #   run: |
+    #     pytest
+
+  docker-build-and-push:
+    needs: security
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: false
+        load: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:dev
+        # ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ env.VERSION }}
+        cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:buildcache
+        cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:buildcache,mode=max
+
+    - name: Push Docker Image with Dev Tag
+      run: |
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:dev
+
+    - name: Scan Docker image
+      uses: anchore/scan-action@v5
+      with:
+        image: "${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:dev"
+        fail-build: false
+        severity-cutoff: high
