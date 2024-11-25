@@ -21,7 +21,6 @@ on:
 jobs:
   security:
     runs-on: ubuntu-latest
-    
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
@@ -81,7 +80,6 @@ jobs:
   docker-build-and-push:
     needs: security
     runs-on: ubuntu-latest
-    
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
@@ -99,17 +97,13 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: .
-        push: false
+        push: true
         load: true
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:dev
-        # ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ env.VERSION }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ github.sha }}
         cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:buildcache
         cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:buildcache,mode=max
-
-    - name: Push Docker Image with Dev Tag
-      run: |
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:dev
 
     - name: Scan Docker image
       uses: anchore/scan-action@v5
@@ -117,3 +111,4 @@ jobs:
         image: "${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:dev"
         fail-build: false
         severity-cutoff: high
+        output-format: table
