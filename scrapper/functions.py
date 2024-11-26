@@ -16,6 +16,15 @@ def get_property_details(url_propiedad):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     try:
+
+        urls_img = [
+            div['style'].split('url(')[1].split(')')[0]  
+            for div in soup.find('div', {'class': 'hero-image-bg hero__3'}).find_all('div', style=True)
+            if 'http' in div['style'] 
+        ]
+
+        country = soup.find('input', {'data-pais': True})['data-pais']
+        
         item_owner_id = soup.find('p', {'class': 'property-code'})
         item_owner_id = item_owner_id.text.strip().split(":")[1].strip() if item_owner_id else None
 
@@ -41,8 +50,26 @@ def get_property_details(url_propiedad):
 
         item_description = ', '.join([f"{key}{value}" for key, value in features.items()])
 
+        n_ambiente = soup.find('li', title="Ambientes").find('div', class_='mobile').find('p', class_='strong')
+        n_ambiente = n_ambiente.text.strip().split()[0] if n_ambiente else None
+
+        n_banios = soup.find('li', title="Baños").find('div', class_='mobile').find('p', class_='strong')
+        n_banios = n_banios.text.strip().split()[0] if n_banios else None
+
+        n_dormitorios = soup.find('li', title="Dormitorios").find('div', class_='mobile').find('p', class_='strong')
+        n_dormitorios = n_dormitorios.text.strip().split()[0] if n_dormitorios else None
+
+        n_antiguedad = soup.find('li', title="Antigüedad").find('div', class_='mobile').find('p', class_='strong')
+        n_antiguedad = n_antiguedad.text.strip().split()[0] if n_antiguedad and n_antiguedad.text.strip().split()[0].isdigit() else "0"
+
         return {
+            'img': urls_img,
+            'country': country,
             'owner_id': item_owner_id,
+            'environments':n_ambiente,
+            'bathrooms': n_banios,
+            'bedrooms': n_dormitorios,
+            'seniority': n_antiguedad,
             'address': item_address,
             'price': item_price,
             'description': item_description,
