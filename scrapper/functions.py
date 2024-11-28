@@ -16,64 +16,64 @@ def get_property_details(url_propiedad):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     try:
-
+        # Obtener imágenes
         urls_img = [
             div['style'].split('url(')[1].split(')')[0]  
             for div in soup.find('div', {'class': 'hero-image-bg hero__3'}).find_all('div', style=True)
             if 'http' in div['style'] 
-        ]
+        ] if soup.find('div', {'class': 'hero-image-bg hero__3'}) else []
 
-        country = soup.find('input', {'data-pais': True})['data-pais']
-        
-        item_owner_id = soup.find('p', {'class': 'property-code'})
-        item_owner_id = item_owner_id.text.strip().split(":")[1].strip() if item_owner_id else None
+        # Obtener país
+        country = soup.find('input', {'data-pais': True})['data-pais'] if soup.find('input', {'data-pais': True}) else None
 
-        item_address = soup.find('p', {'class': 'location-container'})
-        item_address_op = soup.find('h2', {'class': 'titlebar__title'})
-        item_address = item_address.text.strip() if item_address else item_address_op.text.strip()
+        # Obtener state
+        state = soup.find('input', {'data-provincia': True})['data-provincia'] if soup.find('input', {'data-provincia': True}) else None
 
-        item_price = soup.find('div', {'class': 'titlebar__price-mobile'}).find('p')
-        item_price = item_price.text.strip() if item_price else None
+        #Obtener Title
+        title = soup.find('div', {'class': 'titlebar'})
+        title = title.find('h2', {'class': 'titlebar__address'}).text.strip() if title else None
 
-        item_name = soup.find('p', {'class': 'form-details-heading'})
-        item_name = item_name.text.strip() if item_name else None
+        # Obtener dirección
+        latitud = soup.find('div', {'data-latitude': True})['data-latitude'] if soup.find('div', {'data-latitude': True}) else None
+        longitud = soup.find('div', {'data-longitude': True})['data-longitude'] if soup.find('div', {'data-longitude': True}) else None
 
-        item_features = soup.find('ul', {'class': 'property-features'})
-        if item_features:
-            features = {}
-            for li in item_features.find_all('li'):
-                feature_name = li.find('p').contents[0].strip()
-                feature_value = li.find('strong').text.strip()
-                features[feature_name] = feature_value
-        else:
-            features = {}
+        # Obtener precio(Price)
+        price = soup.find('div', {'class': 'titlebar__price-mobile'}).find('p') if soup.find('div', {'class': 'titlebar__price-mobile'}) else None
+        price = price.text.strip() if price else None
 
-        item_description = ', '.join([f"{key}{value}" for key, value in features.items()])
+        # Obtener número de ambientes(Environments)
+        n_ambiente = soup.find('li', title="Ambientes")
+        n_ambiente = n_ambiente.find('div', class_='mobile').find('p', class_='strong').text.strip().split()[0] if n_ambiente else None
 
-        n_ambiente = soup.find('li', title="Ambientes").find('div', class_='mobile').find('p', class_='strong')
-        n_ambiente = n_ambiente.text.strip().split()[0] if n_ambiente else None
+        # Obtener número de baños(Bathrooms)
+        n_banios = soup.find('li', title="Baños")
+        n_banios = n_banios.find('div', class_='mobile').find('p', class_='strong').text.strip().split()[0] if n_banios else None
 
-        n_banios = soup.find('li', title="Baños").find('div', class_='mobile').find('p', class_='strong')
-        n_banios = n_banios.text.strip().split()[0] if n_banios else None
+        # Obtener número de dormitorios(Bedrooms)
+        n_dormitorios = soup.find('li', title="Dormitorios")
+        n_dormitorios = n_dormitorios.find('div', class_='mobile').find('p', class_='strong').text.strip().split()[0] if n_dormitorios else None
 
-        n_dormitorios = soup.find('li', title="Dormitorios").find('div', class_='mobile').find('p', class_='strong')
-        n_dormitorios = n_dormitorios.text.strip().split()[0] if n_dormitorios else None
+        # Obtener antigüedad(Seniority)
+        n_antiguedad = soup.find('li', title="Antigüedad")
+        n_antiguedad = n_antiguedad.find('div', class_='mobile').find('p', class_='strong').text.strip().split()[0] if n_antiguedad else "0"
+        n_antiguedad = n_antiguedad if n_antiguedad.isdigit() else "0"
 
-        n_antiguedad = soup.find('li', title="Antigüedad").find('div', class_='mobile').find('p', class_='strong')
-        n_antiguedad = n_antiguedad.text.strip().split()[0] if n_antiguedad and n_antiguedad.text.strip().split()[0].isdigit() else "0"
+        #Obtener descripción(Description)
+        description = soup.find('div', {'class': 'section-description--content'}).text.strip() if soup.find('div', {'class': 'section-description--content'}) else None
 
         return {
             'img': urls_img,
-            'country': country,
-            'owner_id': item_owner_id,
-            'environments':n_ambiente,
-            'bathrooms': n_banios,
-            'bedrooms': n_dormitorios,
-            'seniority': n_antiguedad,
-            'address': item_address,
-            'price': item_price,
-            'description': item_description,
-            'name': item_name
+            'CountryName': country,
+            'StateName':state,
+            'Title': title,
+            'Latitude': latitud,
+            'Longitude': longitud,
+            'Price': price,
+            'Environments': n_ambiente,
+            'Bathrooms': n_banios,
+            'Bedrooms': n_dormitorios,
+            'Seniority': n_antiguedad,
+            'Description': description
         }
 
     except Exception as e:
