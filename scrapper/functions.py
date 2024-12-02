@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import time
 
 def get_soup(url):
     """Devuelve un objeto BeautifulSoup de la URL especificada."""
@@ -7,7 +8,6 @@ def get_soup(url):
     if response.status_code != 200:
         raise Exception(f"Error al obtener la página: {response.status_code}")
     return BeautifulSoup(response.text, 'html.parser')
-
 
 def get_property_details(url_propiedad):
     """Obtiene los detalles de una propiedad individual."""
@@ -31,7 +31,7 @@ def get_property_details(url_propiedad):
         state = state['data-provincia'] if state else ""
 
         title = soup.find('div', {'class': 'titlebar'})
-        title = title.find('h2', {'class': 'titlebar__address'}).text.strip() if title else ""
+        title = title.find('h2', {'class': 'titlebar__address'}).text.strip() if title and title.find('h2', {'class': 'titlebar__address'}) else ""
 
         latitud = soup.find('div', {'data-latitude': True})
         latitud = latitud['data-latitude'] if latitud else ""
@@ -90,7 +90,6 @@ def get_property_details(url_propiedad):
         print(f"Error procesando {url_propiedad}: {e}")
         return None
 
-
 def get_properties_on_page(soup):
     """Extrae las propiedades de una página."""
     propiedades = soup.find_all('div', {'class': 'listing__item'})
@@ -115,7 +114,6 @@ def get_properties_on_page(soup):
     
     return properties
 
-
 def get_next_page_url(soup):
     """Obtiene la URL de la siguiente página de la paginación."""
     next_page_item = soup.find('li', {'class': 'pagination__page-next pagination__page'})
@@ -124,8 +122,7 @@ def get_next_page_url(soup):
         return f'https://www.argenprop.com{next_page_link}'
     return None
 
-
-def scrape_properties(base_url, limite=None):
+def scrape_properties(base_url, limite=None, batch_size=100, sleep_time=2):
     """Realiza el scraping de todas las páginas hasta el límite especificado."""
     soup = get_soup(base_url)
     next_page = True
@@ -134,11 +131,18 @@ def scrape_properties(base_url, limite=None):
 
     while next_page:
         print(f"Scraping página {page_count}...")
+
         properties = get_properties_on_page(soup)
         casas.extend(properties)
 
+        # Controlar el límite y tamaño de lote
         if limite and len(casas) >= limite:
             return casas[:limite]
+
+        # Control de carga: Pausa después de cada lote
+        if len(casas) % batch_size == 0:
+            print(f"Esperando {sleep_time} segundos...")
+            time.sleep(sleep_time)
 
         next_page_url = get_next_page_url(soup)
         if next_page_url:
