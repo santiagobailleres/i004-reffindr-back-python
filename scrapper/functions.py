@@ -16,55 +16,63 @@ def get_property_details(url_propiedad):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     try:
-        # Obtener imágenes
-        urls_img = [
-            div['style'].split('url(')[1].split(')')[0]  
-            for div in soup.find('div', {'class': 'hero-image-bg hero__3'}).find_all('div', style=True)
-            if 'http' in div['style'] 
-        ] if soup.find('div', {'class': 'hero-image-bg hero__3'}) else []
+        urls_img = []
+        hero_image_div = soup.find('div', {'class': 'hero-image-bg hero__3'})
+        if hero_image_div:
+            urls_img = [
+                div['style'].split('url(')[1].split(')')[0]
+                for div in hero_image_div.find_all('div', style=True)
+                if 'http' in div['style']
+            ]
+        
+        country = soup.find('input', {'data-pais': True})
+        country = country['data-pais'] if country else None
 
-        # Obtener país
-        country = soup.find('input', {'data-pais': True})['data-pais'] if soup.find('input', {'data-pais': True}) else None
+        state = soup.find('input', {'data-provincia': True})
+        state = state['data-provincia'] if state else None
 
-        # Obtener state
-        state = soup.find('input', {'data-provincia': True})['data-provincia'] if soup.find('input', {'data-provincia': True}) else None
-
-        #Obtener Title
         title = soup.find('div', {'class': 'titlebar'})
         title = title.find('h2', {'class': 'titlebar__address'}).text.strip() if title else None
 
-        # Obtener dirección
-        latitud = soup.find('div', {'data-latitude': True})['data-latitude'] if soup.find('div', {'data-latitude': True}) else None
-        longitud = soup.find('div', {'data-longitude': True})['data-longitude'] if soup.find('div', {'data-longitude': True}) else None
+        latitud = soup.find('div', {'data-latitude': True})
+        latitud = latitud['data-latitude'] if latitud else None
 
-        # Obtener precio(Price)
-        price = soup.find('div', {'class': 'titlebar__price-mobile'}).find('p') if soup.find('div', {'class': 'titlebar__price-mobile'}) else None
-        price = price.text.strip() if price else None
+        longitud = soup.find('div', {'data-longitude': True})
+        longitud = longitud['data-longitude'] if longitud else None
 
-        # Obtener número de ambientes(Environments)
+        price = soup.find('div', {'class': 'titlebar__price-mobile'})
+        if price:
+            price = price.find('p')
+            price = price.text.strip() if price else None
+
         n_ambiente = soup.find('li', title="Ambientes")
-        n_ambiente = n_ambiente.find('div', class_='mobile').find('p', class_='strong').text.strip().split()[0] if n_ambiente else None
+        if n_ambiente:
+            n_ambiente = n_ambiente.find('div', class_='mobile').find('p', class_='strong')
+            n_ambiente = n_ambiente.text.strip().split()[0] if n_ambiente else None
 
-        # Obtener número de baños(Bathrooms)
         n_banios = soup.find('li', title="Baños")
-        n_banios = n_banios.find('div', class_='mobile').find('p', class_='strong').text.strip().split()[0] if n_banios else None
+        if n_banios:
+            n_banios = n_banios.find('div', class_='mobile').find('p', class_='strong')
+            n_banios = n_banios.text.strip().split()[0] if n_banios else None
 
-        # Obtener número de dormitorios(Bedrooms)
         n_dormitorios = soup.find('li', title="Dormitorios")
-        n_dormitorios = n_dormitorios.find('div', class_='mobile').find('p', class_='strong').text.strip().split()[0] if n_dormitorios else None
+        if n_dormitorios:
+            n_dormitorios = n_dormitorios.find('div', class_='mobile').find('p', class_='strong')
+            n_dormitorios = n_dormitorios.text.strip().split()[0] if n_dormitorios else None
 
-        # Obtener antigüedad(Seniority)
         n_antiguedad = soup.find('li', title="Antigüedad")
-        n_antiguedad = n_antiguedad.find('div', class_='mobile').find('p', class_='strong').text.strip().split()[0] if n_antiguedad else "0"
+        if n_antiguedad:
+            n_antiguedad = n_antiguedad.find('div', class_='mobile').find('p', class_='strong')
+            n_antiguedad = n_antiguedad.text.strip().split()[0] if n_antiguedad else "0"
         n_antiguedad = n_antiguedad if n_antiguedad.isdigit() else "0"
 
-        #Obtener descripción(Description)
-        description = soup.find('div', {'class': 'section-description--content'}).text.strip() if soup.find('div', {'class': 'section-description--content'}) else None
+        description = soup.find('div', {'class': 'section-description--content'})
+        description = description.text.strip() if description else None
 
         return {
             'img': urls_img,
             'CountryName': country,
-            'StateName':state,
+            'StateName': state,
             'Title': title,
             'Latitude': latitud,
             'Longitude': longitud,
@@ -80,7 +88,6 @@ def get_property_details(url_propiedad):
         print(f"Error procesando {url_propiedad}: {e}")
         return None
 
-
 def get_properties_on_page(soup):
     """Extrae las propiedades de una página."""
     propiedades = soup.find_all('div', {'class': 'listing__item'})
@@ -89,15 +96,21 @@ def get_properties_on_page(soup):
     for propiedad in propiedades:
         try:
             url_pg_propiedad = propiedad.find('a', {'class': 'card'})['href']
+            if not url_pg_propiedad:
+                print(f"URL no encontrada para una propiedad.")
+                continue
+
             url_propiedad = f'https://www.argenprop.com{url_pg_propiedad}'
-            details = get_property_details(url_propiedad)  # Llamada directa
+            details = get_property_details(url_propiedad)
             if details:
                 properties.append(details)
+            else:
+                print(f"Detalles no encontrados para {url_propiedad}")
+
         except Exception as e:
             print(f"Error procesando una propiedad: {e}")
     
     return properties
-
 
 def get_next_page_url(soup):
     """Obtiene la URL de la siguiente página de la paginación."""
@@ -120,11 +133,9 @@ def scrape_properties(base_url, limite=None):
         properties = get_properties_on_page(soup)
         casas.extend(properties)
 
-        # Detener si alcanzamos el límite
         if limite and len(casas) >= limite:
             return casas[:limite]
 
-        # Obtener la siguiente página
         next_page_url = get_next_page_url(soup)
         if next_page_url:
             soup = get_soup(next_page_url)
