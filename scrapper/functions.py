@@ -31,7 +31,7 @@ def get_property_details(url_propiedad):
         state = state['data-provincia'] if state else ""
 
         title = soup.find('div', {'class': 'titlebar'})
-        title = title.find('h2', {'class': 'titlebar__address'}).text.strip() if title else ""
+        title = title.find('h2', {'class': 'titlebar__address'}).text.strip() if title and title.find('h2', {'class': 'titlebar__address'}) else ""
 
         latitud = soup.find('div', {'data-latitude': True})
         latitud = latitud['data-latitude'] if latitud else ""
@@ -89,7 +89,6 @@ def get_property_details(url_propiedad):
     except Exception as e:
         print(f"Error procesando {url_propiedad}: {e}")
         return None
-
 
 def get_properties_on_page(soup):
     """Extrae las propiedades de una página."""
