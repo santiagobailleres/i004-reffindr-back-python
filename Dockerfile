@@ -37,7 +37,7 @@ RUN rm -f requirements.txt
 USER appuser
 
 # Exponer el puerto en el que escucha la aplicación
-EXPOSE 8000
+EXPOSE 8020
 
 # Comando por defecto para ejecutar la aplicación con los parámetros ajustados
-CMD ["gunicorn", "app:app", "--bind=0.0.0.0:8000", "--workers=4", "--threads=4", "--timeout=120"]
+CMD ["gunicorn", "app:app", "--bind=0.0.0.0:8020", "--workers=4", "--threads=4", "--timeout=120"]
