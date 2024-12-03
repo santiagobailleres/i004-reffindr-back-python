@@ -23,7 +23,7 @@ RUN adduser \
 
 # Copia el archivo de dependencias e instala las librerías necesarias
 # Usa un caché de pip para acelerar instalaciones en futuras construcciones
-COPY requirements.txt .
+COPY requirements.txt . 
 RUN --mount=type=cache,target=/root/.cache/pip \
     python -m pip install --no-cache-dir -r requirements.txt
 
@@ -39,5 +39,5 @@ USER appuser
 # Exponer el puerto en el que escucha la aplicación
 EXPOSE 8000
 
-# Comando por defecto para ejecutar la aplicación
-CMD ["gunicorn", "app:app", "--bind=0.0.0.0:8000", "--workers=4"]
+# Comando por defecto para ejecutar la aplicación con los parámetros ajustados
+CMD ["gunicorn", "app:app", "--bind=0.0.0.0:8000", "--workers=4", "--threads=4", "--timeout=120"]
