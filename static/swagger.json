@@ -13,6 +13,10 @@
     },
     {
         "url": "https://i004-reffindr-back-python-dev.onrender.com",
+        "description": "Staging"
+    },
+    {
+        "url": "http://reffindr-alb-1167121448.us-east-1.elb.amazonaws.com:4155",
         "description": "Producción"
     }
     ],
