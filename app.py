@@ -1,9 +1,27 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect
 from scrapper.functions import scrape_properties
 import json
+from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
 
+# Configuración de Swagger UI
+SWAGGER_URL = '/swagger'  
+API_DOCS_URL = '/static/swagger.json'  
+
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_DOCS_URL,
+    config={'app_name': "Reffindr API"}
+)
+
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+@app.route('/')
+def index():
+    return redirect('/swagger')
+
+# Endpoint para argenprop
 @app.route('/argenprop', methods=['GET', 'POST'])
 def argenprop_web_scraper():
     try:

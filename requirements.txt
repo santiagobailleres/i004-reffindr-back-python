@@ -3,4 +3,7 @@ bs4
 pandas
 Flask==3.1.0
 gunicorn
+geopy
 jupyter
+numpy
+flask-swagger-ui
