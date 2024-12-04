@@ -1,0 +1,21 @@
+{
+  "name": "Tema Personalizado",
+  "dataColors": [
+      "#8b8b7e",
+      "#3d4044",
+      "#d3d6d9",
+      "#d7d0c6",
+      "#80807d"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#000000",
+  "tableAccent": "#8b8b7e",
+  "visualStyles": {
+      "*": {
+          "*": {
+              "fontFamily": "Times New Roman",
+              "fontSize": 12
+          }
+      }
+  }
+}
