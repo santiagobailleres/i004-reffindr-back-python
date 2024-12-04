@@ -5,9 +5,17 @@
     "title": "Reffindr API",
     "description": "Documentación de la API para Reffindr"
     },
-    "host": "i004-reffindr-back-python-dev.onrender.com",
     "basePath": "/",
-    "schemes": ["https"],
+    "servers": [
+    {
+        "url": "http://127.0.0.1:5000",
+        "description": "Local"
+    },
+    {
+        "url": "https://i004-reffindr-back-python-dev.onrender.com",
+        "description": "Producción"
+    }
+    ],
     "paths": {
         "/argenprop": {
             "get": {
