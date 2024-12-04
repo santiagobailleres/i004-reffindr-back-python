@@ -6,8 +6,8 @@ from flask_swagger_ui import get_swaggerui_blueprint
 app = Flask(__name__)
 
 # Configuración de Swagger UI
-SWAGGER_URL = '/swagger'  
-API_DOCS_URL = '/static/swagger.json'  
+SWAGGER_URL = '/swagger'
+API_DOCS_URL = '/static/swagger.json'
 
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
@@ -17,6 +17,7 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
+# Endpoint de inicio
 @app.route('/')
 def index():
     return redirect('/swagger')
