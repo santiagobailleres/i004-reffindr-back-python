@@ -6,3 +6,6 @@ gunicorn
 geopy
 jupyter
 numpy
+sqlalchemy
+psycopg2-binary
+unidecode
