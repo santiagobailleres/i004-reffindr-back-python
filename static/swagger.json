@@ -1,0 +1,86 @@
+{
+"swagger": "2.0",
+"info": {
+    "version": "1.0.0",
+    "title": "Reffindr API",
+    "description": "Documentación de la API para Reffindr"
+    },
+    "basePath": "/",
+    "servers": [
+    {
+        "url": "http://127.0.0.1:5000",
+        "description": "Local"
+    },
+    {
+        "url": "https://i004-reffindr-back-python-dev.onrender.com",
+        "description": "Staging"
+    },
+    {
+        "url": "http://reffindr-alb-1167121448.us-east-1.elb.amazonaws.com:4155",
+        "description": "Producción"
+    }
+    ],
+    "paths": {
+        "/argenprop": {
+            "get": {
+                "summary": "Obtener propiedades",
+                "description": "Devuelve una lista de propiedades de Argenprop.",
+                "parameters": [
+                {
+                    "name": "pais",
+                    "in": "query",
+                    "required": true,
+                    "type": "string",
+                    "description": "País donde buscar propiedades."
+                },
+                {
+                    "name": "limite",
+                    "in": "query",
+                    "required": false,
+                    "type": "integer",
+                    "description": "Número máximo de propiedades a devolver."
+                }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de propiedades",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Property"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error en los parámetros"
+                    },
+                    "404": {
+                        "description": "No se encontraron propiedades"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Property": {
+            "type": "object",
+            "properties": {
+                "img": {
+                    "type": "array",
+                    "items": {"type": "string"}
+                },
+                "CountryName": {"type": "string"},
+                "StateName": {"type": "string"},
+                "Title": {"type": "string"},
+                "Latitude": {"type": "string"},
+                "Longitude": {"type": "string"},
+                "Price": {"type": "string"},
+                "Environments": {"type": "string"},
+                "Bathrooms": {"type": "string"},
+                "Bedrooms": {"type": "string"},
+                "Seniority": {"type": "string"},
+                "Description": {"type": "string"}
+            }
+        }
+    }
+}
