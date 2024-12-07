@@ -77,9 +77,9 @@ jobs:
     #   run: |
     #     pytest
 
-    - name: Run ETL Script
-      run: |
-        python etl.py
+    # - name: Run ETL Script
+    #   run: |
+    #     python etl.py
 
   docker-build-and-push:
     needs: security
