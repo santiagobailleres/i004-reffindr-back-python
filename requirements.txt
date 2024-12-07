@@ -6,6 +6,7 @@ gunicorn
 geopy
 jupyter
 numpy
+flask-swagger-ui
 sqlalchemy
 psycopg2-binary
 unidecode
