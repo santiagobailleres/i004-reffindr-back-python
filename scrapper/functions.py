@@ -1,3 +1,4 @@
+
 import requests
 from bs4 import BeautifulSoup
 import time
@@ -34,39 +35,39 @@ def get_property_details(url_propiedad):
         title = title.find('h2', {'class': 'titlebar__address'}).text.strip() if title and title.find('h2', {'class': 'titlebar__address'}) else ""
 
         latitud = soup.find('div', {'data-latitude': True})
-        latitud = latitud['data-latitude'] if latitud else 0.0
+        latitud = latitud['data-latitude'] if latitud else ""
 
         longitud = soup.find('div', {'data-longitude': True})
-        longitud = longitud['data-longitude'] if longitud else 0.0
+        longitud = longitud['data-longitude'] if longitud else ""
 
         price = soup.find('div', {'class': 'titlebar__price-mobile'})
         if price:
             price = price.find('p')
-            price = price.text.strip() if price else 0
+            price = price.text.strip() if price else ""
 
         n_ambiente = soup.find('li', title="Ambientes")
         if n_ambiente:
             n_ambiente = n_ambiente.find('div', class_='mobile').find('p', class_='strong')
-            n_ambiente = n_ambiente.text.strip().split()[0] if n_ambiente else 0
+            n_ambiente = n_ambiente.text.strip().split()[0] if n_ambiente else ""
 
         n_banios = soup.find('li', title="Baños")
         if n_banios:
             n_banios = n_banios.find('div', class_='mobile').find('p', class_='strong')
-            n_banios = n_banios.text.strip().split()[0] if n_banios else 0
+            n_banios = n_banios.text.strip().split()[0] if n_banios else ""
 
         n_dormitorios = soup.find('li', title="Dormitorios")
         if n_dormitorios:
             n_dormitorios = n_dormitorios.find('div', class_='mobile').find('p', class_='strong')
-            n_dormitorios = n_dormitorios.text.strip().split()[0] if n_dormitorios else 0
+            n_dormitorios = n_dormitorios.text.strip().split()[0] if n_dormitorios else ""
 
         n_antiguedad = soup.find('li', title="Antigüedad")
         if n_antiguedad:
             n_antiguedad = n_antiguedad.find('div', class_='mobile').find('p', class_='strong')
-            n_antiguedad = n_antiguedad.text.strip().split()[0] if n_antiguedad else 0
+            n_antiguedad = n_antiguedad.text.strip().split()[0] if n_antiguedad else ""
         else:
-            n_antiguedad = 0
+            n_antiguedad = ""  
 
-        n_antiguedad = n_antiguedad if str(n_antiguedad).isdigit() else 0
+        n_antiguedad = n_antiguedad if str(n_antiguedad).isdigit() else "0"
 
         description = soup.find('div', {'class': 'section-description--content'})
         description = description.text.strip() if description else ""
