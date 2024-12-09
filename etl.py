@@ -9,8 +9,8 @@ import pandas as pd
 from datetime import datetime
 import pytz
 from unidecode import unidecode
-import psycopg2
 from sqlalchemy import create_engine
+import time
 
 from functions.functions import convert_to_ars
 from functions.functions import obtener_direccion
@@ -24,13 +24,35 @@ from functions.functions import remove_last_two_parts
 #===============================================================================================
 load_dotenv()
 
-url = os.getenv('API_URL')
+# Función para hacer una solicitud con reintentos
+def get_data_with_retries(url, params, retries=3, delay=2):
+    attempt = 0
+    while attempt < retries:
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status() 
+            return response.json()  # Si la respuesta es exitosa, retorna el JSON
+        except requests.exceptions.RequestException as e:
+            attempt += 1
+            print(f"Intento {attempt} fallido: {e}")
+            if attempt < retries:
+                print(f"Reintentando en {delay} segundos...")
+                time.sleep(delay)  # Espera entre intentos
+            else:
+                print("Se agotaron los intentos de reintento")
+                raise
+    return None
 
-# Parámetros de la solicitud
+# Usar la función con los parámetros adecuados
+url = os.getenv('API_URL')
 params = {'pais': 'argentina', 'limite': 300}
-response = requests.get(url, params=params)
-data = response.json()
-df = pd.DataFrame(data)
+
+data = get_data_with_retries(url, params)
+if data:
+    df = pd.DataFrame(data)
+    print('Conexión exitosa y datos cargados')
+else:
+    print('No se pudieron cargar los datos después de varios intentos')
 
 #===============================================================================================
 # 2. TRANSFORMATIONS
@@ -180,6 +202,7 @@ df_prop.rename(columns={'RangeSalary': 'SalaryId'}, inplace=True)
 #Cambiar las columnas a tipo Int64
 df_prop[['Environments', 'Bathrooms', 'Bedrooms', 'Seniority']] = df_prop[['Environments', 'Bathrooms', 'Bedrooms', 'Seniority']].astype('int64')
 
+print('ya esta la propiedades')
 #===============================================================================================
 ## 2.3 Transformación Tabla de datos de Usuarios
 #===============================================================================================
@@ -399,6 +422,9 @@ Properties['Address'] = Properties['Address'].str.slice(0, 50)
 
 #Conexión a aws postgres database
 
+from sqlalchemy import create_engine
+import psycopg2
+
 usuario = os.getenv('DB_USER')
 contraseña = os.getenv('DB_PASSWORD')
 host = os.getenv('DB_HOST')
@@ -408,10 +434,9 @@ schema = os.getenv('DB_SCHEMA')
 DATABASE_URL = f"postgresql+psycopg2://{usuario}:{contraseña}@{host}:5432/{dbname}"
 engine_aws = create_engine(DATABASE_URL, connect_args={"options": f"-csearch_path={schema}"})
 
-print("Conexión exitosa")
+print("Conexión exitosa a la base de datos aws")
 
 # Eliminación de la columnas Ids
-
 Requirements1 = Requirements.drop('Id', axis=1)
 Properties1 = Properties.drop('Id', axis=1)
 Images1 = Images.drop('Id', axis=1)
@@ -438,14 +463,3 @@ print('Se subio tabla UsersOwnersInfo')
 
 UsersTenantsInfo1.to_sql("UsersTenantsInfo", engine_aws, schema=schema, if_exists="append", index=False)
 print('Se subio tabla UsersTenantsInfo')
-
-
-
-
-
-
-
-
-
-
-
