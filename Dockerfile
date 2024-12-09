@@ -40,4 +40,4 @@ USER appuser
 EXPOSE 8020
 
 # Comando por defecto para ejecutar la aplicación con los parámetros ajustados
-CMD ["gunicorn", "app:app", "--bind=0.0.0.0:8020", "--workers=4", "--threads=4", "--timeout=120"]
+CMD ["gunicorn", "app:app", "--bind=0.0.0.0:8020", "--workers=1", "--threads=2", "--timeout=60"]
