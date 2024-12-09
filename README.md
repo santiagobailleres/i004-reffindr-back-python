@@ -108,5 +108,21 @@ http://127.0.0.1:5000/argenprop?pais=argentina&limite=10
 ## 🗂️ Modelo de Base de Datos
 El archivo ERD DIAGRAM REFFINDR TEAM DATA.pdf contiene el diseño del modelo relacional, incluyendo las tablas principales para almacenar datos de propiedades, usuarios y agentes inmobiliarios.
 
+---
+
+### 🛠️ Tecnologías Utilizadas
+Lenguaje:
+Framework API:
+Base de Datos:
+Almacenamiento: AWS RDS
+Librerías Clave
+Flask: Creación de la API.
+BeautifulSoup: Scraping de datos HTML.
+pandas: Manipulación de datos.
+sqlalchemy: Conexión a bases de datos.
+boto3: Interacción con AWS.
+argparse: Manejo de argumentos para el script ETL.
+
+
 
 
