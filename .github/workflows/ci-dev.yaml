@@ -77,9 +77,11 @@ jobs:
     #   run: |
     #     pytest
 
-    - name: Run ETL script
+    - name: Debug Environment
       run: |
-        python etl.py
+        python etl.py  true
+        echo "Inspeccionando logs"
+        cat etl.log  echo "Sin logs"
       env:
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
