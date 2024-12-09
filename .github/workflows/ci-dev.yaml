@@ -77,18 +77,16 @@ jobs:
     #   run: |
     #     pytest
 
-    - name: Debug Environment
-      run: |
-        python etl.py  true
-        echo "Inspeccionando logs"
-        cat etl.log  echo "Sin logs"
-      env:
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_SCHEMA: ${{ secrets.DB_SCHEMA }}
-        API_URL: ${{ secrets.API_URL }}
+    # - name: Debug Environment
+    #   run: |
+    #     python etl.py  true
+    #   env:
+    #     DB_USER: ${{ secrets.DB_USER }}
+    #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    #     DB_HOST: ${{ secrets.DB_HOST }}
+    #     DB_NAME: ${{ secrets.DB_NAME }}
+    #     DB_SCHEMA: ${{ secrets.DB_SCHEMA }}
+    #     API_URL: ${{ secrets.API_URL }}
 
   docker-build-and-push:
     needs: security
