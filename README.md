@@ -47,19 +47,7 @@ cd reffindr-python-data
 ---
 
 ### 2️⃣ Configurar Variables de Entorno
-
-Crea un archivo .env en la raíz del proyecto para configurar las variables necesarias (credenciales de la database y url de la APi). Ejemplo:
-
-``` bash
-API_URL = http://reffindr-alb-1167121448.us-east-1.elb.amazonaws.com:4155/argenprop
-DB_USER = Reffindr
-DB_PASSWORD = uRnbS
-DB_HOST = database-igrowker.cd0a0mu0w68g.us-east-2.rds.amazonaws.com
-DB_NAME = intake004
-DB_SCHEMA = ReffindrDBSchema
-```
-
-### 🛠️ Configuración de Base de Datos
+#### 🛠️ Configuración de Base de Datos
 
 El proyecto utiliza una base de datos alojada en **AWS RDS** como ejemplo, pero puedes configurar tu propia base de datos con tus credenciales. Para esto, asegúrate de definir las siguientes variables en un archivo `.env`:
 
@@ -110,18 +98,21 @@ El archivo ERD DIAGRAM REFFINDR TEAM DATA.pdf contiene el diseño del modelo rel
 
 ---
 
-### 🛠️ Tecnologías Utilizadas
-Lenguaje:
-Framework API:
-Base de Datos:
-Almacenamiento: AWS RDS
-Librerías Clave
-Flask: Creación de la API.
-BeautifulSoup: Scraping de datos HTML.
-pandas: Manipulación de datos.
-sqlalchemy: Conexión a bases de datos.
-boto3: Interacción con AWS.
-argparse: Manejo de argumentos para el script ETL.
+## 🛠️ Tecnologías Utilizadas
+
+- **Lenguaje:** Python
+- **Framework API:** Flask
+- **Base de Datos:** AWS RDS
+
+## Librerías Clave
+
+- **Flask**: Creación de la API.
+- **BeautifulSoup**: Scraping de datos HTML.
+- **pandas**: Manipulación de datos.
+- **sqlalchemy**: Conexión a bases de datos.
+- **boto3**: Interacción con AWS.
+- **argparse**: Manejo de argumentos para el script ETL.
+
 
 
 
