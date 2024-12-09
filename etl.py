@@ -2,6 +2,8 @@
 # Librerías
 #===============================================================================================
 import requests
+import os
+from dotenv import load_dotenv
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -20,8 +22,9 @@ from functions.functions import remove_last_two_parts
 #===============================================================================================
 # 1. EXTRACT
 #===============================================================================================
-url = 'https://i004-reffindr-back-python-dev.onrender.com/argenprop'
-#url = 'http://reffindr-alb-1167121448.us-east-1.elb.amazonaws.com:41555/argenprop'
+load_dotenv()
+
+url = os.getenv('API_URL')
 
 # Parámetros de la solicitud
 params = {'pais': 'argentina', 'limite': 300}
@@ -332,13 +335,16 @@ Users['Dni'] = Users['Dni'].astype(str)
 # Seleccionar columnas 
 df_images = df_prop[['Id', 'img', 'CreatedAt', 'UpdatedAt', 'IsDeleted']]
 
+# Renombrar columnas
 df_images = df_images.rename(columns={'Id': 'PropertyId', 'img': 'ImageUrl'})
 
+# Insertar nuevas columnas
 df_images.insert(0, 'Id', range(1, len(df_images) + 1))
 df_images.insert(2, 'UserId', pd.Series([None] * len(df_images), dtype="Int64"))
 
 Images = df_images.copy()
 
+# Convertir a tipo lista
 Images['ImageUrl'] = Images['ImageUrl'].apply(lambda x: eval(x) if isinstance(x, str) and x.startswith('[') else x)
 
 #===============================================================================================
@@ -353,29 +359,36 @@ Requirements = Requirements.rename(columns={'SalaryId':'RangeSalary'})
 ## 2.13 Tabla de datos de Properties
 #===============================================================================================
 Properties = df_prop.copy()
+
+# Eliminando columnas innecesarias
 Properties.drop(['IsWorking', 'HasWarranty', 'SalaryId'], axis=1, inplace=True)
+
+# Unir con la tabla UsersTenantsInfo
 Properties = Properties.merge(UsersTenantsInfo[['Id', 'UserId', ]], on='Id', how='inner')
 Properties.insert(2, 'UserId', Properties.pop('UserId'))
 Properties.rename(columns={'UserId': 'TenantId'}, inplace=True)
 
+# Unir con la tabla UsersOwnersInfo
 Properties = Properties.merge(UsersOwnersInfo[['Id', 'UserId']], on='Id', how='inner')
 Properties.insert(2, 'UserId', Properties.pop('UserId'))
 Properties.rename(columns={'UserId': 'OwnerId'}, inplace=True)
 
 Properties.insert(4, 'RequirementId', range(1, len(Requirements) + 1))
 
+# Mapeo de nombres de país y estado
 Properties["CountryName"] = Properties["CountryName"].map(Countries.set_index("CountryName")["Id"])
 Properties["StateName"] = Properties["StateName"].apply(lambda x: unidecode(x).lower()).map(
     States.set_index(States["StateName"].apply(lambda x: unidecode(x).lower()))["Id"]
 )
 
+# Mapeo las URLs de imágenes a los IDs:
 Properties["img"] = Properties["img"].map(df_images.set_index("ImageUrl")["Id"])
 
+# Eliminando la columna Id y renombrar otras columnas
 Properties.drop('Id', axis=1, inplace=True)
-
 Properties.rename(columns={'img': 'Id', 'CountryName': 'CountryId', 'StateName': 'StateId'}, inplace=True)
 
-#arreglando la descripcion es muy largo solo acepta 100 varchar
+# Limitando las caracteristicas de algunas columnas
 Properties['Description'] = Properties['Description'].str.slice(0, 1000)
 Properties['Title'] = Properties['Title'].str.slice(0, 50)
 Properties['Address'] = Properties['Address'].str.slice(0, 50)
@@ -386,11 +399,11 @@ Properties['Address'] = Properties['Address'].str.slice(0, 50)
 
 #Conexión a aws postgres database
 
-usuario = 'Reffindr'
-contraseña = 'uRnbS'
-host = 'database-igrowker.cd0a0mu0w68g.us-east-2.rds.amazonaws.com'
-dbname = 'intake004'
-schema = 'ReffindrDBSchema'
+usuario = os.getenv('DB_USER')
+contraseña = os.getenv('DB_PASSWORD')
+host = os.getenv('DB_HOST')
+dbname = os.getenv('DB_NAME')
+schema = os.getenv('DB_SCHEMA')
 
 DATABASE_URL = f"postgresql+psycopg2://{usuario}:{contraseña}@{host}:5432/{dbname}"
 engine_aws = create_engine(DATABASE_URL, connect_args={"options": f"-csearch_path={schema}"})
