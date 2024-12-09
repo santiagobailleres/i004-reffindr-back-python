@@ -206,7 +206,7 @@ df_prop[['Environments', 'Bathrooms', 'Bedrooms', 'Seniority']] = df_prop[['Envi
 ## 2.3 Transformación Tabla de datos de Usuarios
 #===============================================================================================
 # Cargar el archivo CSV con la información de los usuarios ficticios
-csv_path = 'Data_ficticia\\Users_Ficticios_IA.csv'
+csv_path = 'https://raw.githubusercontent.com/igrowker/i004-reffindr-back-python/develop/Data_ficticia/Users_Ficticios_IA.csv'
 df_users = pd.read_csv(csv_path, delimiter=';')
 
 # Tomar una muestra aleatoria de 200 usuarios y resetear el índice
