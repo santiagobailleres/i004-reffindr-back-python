@@ -57,7 +57,7 @@ else:
 #===============================================================================================
 # 2. TRANSFORMATIONS
 #===============================================================================================
-
+print('Comenzando la transformacion de datos')
 #===============================================================================================
 ## 2.1 TABLA STATES
 #===============================================================================================
@@ -202,7 +202,6 @@ df_prop.rename(columns={'RangeSalary': 'SalaryId'}, inplace=True)
 #Cambiar las columnas a tipo Int64
 df_prop[['Environments', 'Bathrooms', 'Bedrooms', 'Seniority']] = df_prop[['Environments', 'Bathrooms', 'Bedrooms', 'Seniority']].astype('int64')
 
-print('ya esta la propiedades')
 #===============================================================================================
 ## 2.3 Transformación Tabla de datos de Usuarios
 #===============================================================================================
@@ -416,6 +415,7 @@ Properties['Description'] = Properties['Description'].str.slice(0, 1000)
 Properties['Title'] = Properties['Title'].str.slice(0, 50)
 Properties['Address'] = Properties['Address'].str.slice(0, 50)
 
+print('Se termino la transformación de datos')
 #===============================================================================================
 ## 3 Cargado de datos a una base de datos
 #===============================================================================================
