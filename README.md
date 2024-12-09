@@ -1,82 +1,112 @@
-[![Develop CI/CD Pipeline](https://github.com/igrowker/i004-reffindr-back-python/actions/workflows/ci-dev.yaml/badge.svg)](https://github.com/igrowker/i004-reffindr-back-python/actions/workflows/ci-dev.yaml)
-[![Production CI/CD Pipeline](https://github.com/igrowker/i004-reffindr-back-python/actions/workflows/ci-prod.yaml/badge.svg)](https://github.com/igrowker/i004-reffindr-back-python/actions/workflows/ci-prod.yaml)
+# 🏡 Reffindr Python Data Repository
 
-## FastAPI official repository
+[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)  
+[![Flask](https://img.shields.io/badge/Flask-v2.0.3-orange)](https://flask.palletsprojects.com/)  
+[![AWS RDS](https://img.shields.io/badge/AWS-RDS-green)](https://aws.amazon.com/rds/)  
+[![Status](https://img.shields.io/badge/status-active-success.svg)](https://github.com/tu_usuario/reffindr-python-data)
 
-    https://github.com/fastapi/fastapi
+Este repositorio contiene los scripts y recursos creados por el equipo **Python Data** para el proyecto **Reffindr**, enfocándose en la extracción, transformación y carga (ETL) de datos inmobiliarios, así como la creación de una API REST con Flask.
 
-## Installation
+---
 
-Create and activate a <a href="https://fastapi.tiangolo.com/virtual-environments/" class="external-link" target="_blank">virtual environment</a> and then install FastAPI:
+## 🌟 Funcionalidades Principales
 
-<div class="termy">
+- **Web scraping con Flask API**: Extrae datos de propiedades inmobiliarias desde [Argenprop](https://www.argenprop.com/).
+- **ETL automatizado**: Procesa los datos extraídos, los transforma y los carga en una base de datos AWS RDS.
+- **Modelo de datos**: Estructura optimizada y documentada en un diagrama de relación (ER Diagram).
 
-```console
-$ pip install "fastapi[standard]"
+---
 
----> 100%
+## 📂 Estructura del Proyecto
+
+```plaintext
+reffindr-python-data/
+├── app.py                   # API desarrollada con Flask para scraping
+├── etl.py                   # Pipeline ETL: extracción, transformación y carga
+├── functions/               # Funciones auxiliares reutilizables
+├── scrapper/                # Código específico para scraping
+├── static/                  # Archivos estáticos para entornos staging/producción
+├── Data_ficticia/           # Datos ficticios para pruebas locales
+├── Dockerfile               # Configuración de Docker para contenedores
+├── requirements.txt         # Dependencias necesarias para ejecutar el proyecto
+├── ERD DIAGRAM REFFINDR TEAM DATA.pdf  # Modelo de base de datos
+├── README.md                # Este archivo
+└── compose.yaml             # Configuración de Docker Compose
+```
+---
+
+## 🚀 Cómo Empezar
+
+### 1️⃣ Clonar el Repositorio
+Primero, clona este repositorio en tu máquina local:
+
+```bash
+git clone https://github.com/igrowker/i004-reffindr-back-python.git
+cd reffindr-python-data
+```
+---
+
+### 2️⃣ Configurar Variables de Entorno
+
+Crea un archivo .env en la raíz del proyecto para configurar las variables necesarias (credenciales de la database y url de la APi). Ejemplo:
+
+``` bash
+API_URL = http://reffindr-alb-1167121448.us-east-1.elb.amazonaws.com:4155/argenprop
+DB_USER = Reffindr
+DB_PASSWORD = uRnbS
+DB_HOST = database-igrowker.cd0a0mu0w68g.us-east-2.rds.amazonaws.com
+DB_NAME = intake004
+DB_SCHEMA = ReffindrDBSchema
 ```
 
-</div>
+### 🛠️ Configuración de Base de Datos
 
-**Note**: Make sure you put `"fastapi[standard]"` in quotes to ensure it works in all terminals.
+El proyecto utiliza una base de datos alojada en **AWS RDS** como ejemplo, pero puedes configurar tu propia base de datos con tus credenciales. Para esto, asegúrate de definir las siguientes variables en un archivo `.env`:
 
-### Run it
-
-Run the server with:
-
-<div class="termy">
-
-```console
-$ fastapi dev main.py
-
- ╭────────── FastAPI CLI - Development mode ───────────╮
- │                                                     │
- │  Serving at: http://127.0.0.1:8000                  │
- │                                                     │
- │  API docs: http://127.0.0.1:8000/docs               │
- │                                                     │
- │  Running in development mode, for production use:   │
- │                                                     │
- │  fastapi run                                        │
- │                                                     │
- ╰─────────────────────────────────────────────────────╯
-
-INFO:     Will watch for changes in these directories: ['/home/user/code/awesomeapp']
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [2248755] using WatchFiles
-INFO:     Started server process [2248757]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
+```plaintext
+DB_USER=tu_usuario        # Usuario de la base de datos
+DB_PASSWORD=tu_contraseña # Contraseña de la base de datos
+DB_HOST=tu_host           # Dirección del host (ejemplo: localhost o una URL de RDS)
+DB_NAME=tu_basededatos    # Nombre de tu base de datos
+DB_SCHEMA=tu_esquema      # Nombre del esquema (opcional)
 ```
-### Building and running your application
 
-When you're ready, start your application by running:
+### 3️⃣ Instalar Dependencias
+Asegúrate de tener Python 3.9+ instalado. Luego, ejecuta:
 
-`docker compose up --build`.
+```plaintext
+pip install -r requirements.txt
+```
 
-Your application will be available at http://localhost:8000.
+## 🖥️ Uso de la API (app.py)
+Ejecutar la API Localmente
+Inicia el servidor Flask localmente con:
 
-### Deploying your application to the cloud
+```plaintext
+python app.py
+```
 
-First, build your image, e.g.:
+## Endpoints Disponibles
 
-`docker build -t myapp .`
+Este proyecto expone los siguientes endpoints para interactuar con la API:
 
-If your cloud uses a different CPU architecture than your development
-machine (e.g., you are on a Mac M1 and your cloud provider is amd64),
-you'll want to build the image for that platform, e.g.:
+### `/swagger`
+- **Método:** `GET`
+- **Descripción:** Proporciona documentación interactiva generada automáticamente con [Swagger](https://swagger.io/) para explorar y probar la API.
 
-`docker build --platform=linux/amd64 -t myapp .`.
+### `/argenprop`
+- **Método:** `GET`
+- **Descripción:** Realiza scraping de propiedades en Argenprop basadas en los parámetros proporcionados.
+- **Parámetros:**
+  - `pais`: Especifica el país de las propiedades a obtener (por ejemplo, "argentina").
+  - `limite`: Establece el número máximo de propiedades a obtener (por ejemplo, "10").
+  
+- **Ejemplo de solicitud:**
+http://127.0.0.1:5000/argenprop?pais=argentina&limite=10
 
-Then, push it to your registry, e.g.
 
-`docker push myregistry.com/myapp`.
+## 🗂️ Modelo de Base de Datos
+El archivo ERD DIAGRAM REFFINDR TEAM DATA.pdf contiene el diseño del modelo relacional, incluyendo las tablas principales para almacenar datos de propiedades, usuarios y agentes inmobiliarios.
 
-Consult Docker's [getting started](https://docs.docker.com/go/get-started-sharing/)
-docs for more detail on building and pushing.
 
-### References
-* [Docker's Python guide](https://docs.docker.com/language/python/)
 
-</div>
