@@ -24,6 +24,15 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    # - name: Run ETL Script
+    #   run: |
+    #     python etl.py
     
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -44,3 +53,23 @@ jobs:
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ github.sha }}
         cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:buildcache
         cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:buildcache,mode=max
+
+  pull-and-deploy:
+    runs-on: [self-hosted, linux, python]
+    needs: docker-build-and-push
+    steps:
+    - name: Deploy Docker container to EC2
+      run: |
+        docker stop reffindr-python || true
+        docker rm -f reffindr-python || true
+    
+        docker system prune -af --volumes
+    
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:prod
+    
+        docker run \
+        -d \
+        --name reffindr-python \
+        -e PORT=${{ secrets.CONTAINER_PORT }} \
+        -p ${{ secrets.HOST_PORT }}:${{ secrets.CONTAINER_PORT }} \
+        ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:prod

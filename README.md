@@ -1,4 +1,5 @@
 [![Develop CI/CD Pipeline](https://github.com/igrowker/i004-reffindr-back-python/actions/workflows/ci-dev.yaml/badge.svg)](https://github.com/igrowker/i004-reffindr-back-python/actions/workflows/ci-dev.yaml)
+[![Production CI/CD Pipeline](https://github.com/igrowker/i004-reffindr-back-python/actions/workflows/ci-prod.yaml/badge.svg)](https://github.com/igrowker/i004-reffindr-back-python/actions/workflows/ci-prod.yaml)
 
 ## FastAPI official repository
 
